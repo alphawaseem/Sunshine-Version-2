@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,25 +34,10 @@ public class ForecastFragment extends Fragment {
 
     private static final String LOG_TAG = ForecastFragment.class.getSimpleName();
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.forecastfragment, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.refresh : new FetchWeatherTask().execute();
-        }
-
-        return true;
-    }
+    private int cityId = 573201;
+    private int noOfDays = 7 ;
+    private String appid = AppId.getApiKey();
+    private String units = "metrics";
 
     public ForecastFragment() {
         // Required empty public constructor
@@ -83,16 +69,16 @@ public class ForecastFragment extends Fragment {
 
 
 
-
         return rootView;
     }
 
-    public class FetchWeatherTask extends AsyncTask<String,Void,String[]> {
+    public class FetchWeatherTask extends AsyncTask<URL,Void,String[]> {
 
         @Override
-        protected String[] doInBackground(String... strings) {
+        protected String[] doInBackground(URL... urls) {
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
+            URL url = urls[0];
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
 
@@ -103,13 +89,12 @@ public class ForecastFragment extends Fragment {
                 // Construct the URL for the OpenWeatherMap query
                 // Possible parameters are avaiable at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
-                StringBuilder stringUrl = new StringBuilder("http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7");
-                stringUrl.append(AppId.getApiKey());
-                URL url = new URL(stringUrl.toString());
 
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
+                urlConnection.setConnectTimeout(1000);
+                urlConnection.setReadTimeout(1500);
                 urlConnection.connect();
 
                 // Read the input stream into a String
@@ -137,7 +122,7 @@ public class ForecastFragment extends Fragment {
                 Log.v(LOG_TAG,forecastJsonStr);
 
             } catch (IOException e) {
-                Log.e(LOG_TAG, "Error ", e);
+                Log.e(LOG_TAG, e.getMessage());
                 // If the code didn't successfully get the weather data, there's no point in attemping
                 // to parse it.
                 return null;
@@ -155,6 +140,36 @@ public class ForecastFragment extends Fragment {
             }
             return null;
         }
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.forecastfragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        StringBuilder strUrl = new StringBuilder("http://api.openweathermap.org/data/2.5/forecast/daily?mode=json");
+        strUrl.append("&q=").append(cityId).append("&units=").append(units).append("&cnt=").append(noOfDays).append("&appid=").append(appid);
+        URL url = null;
+        try {
+            url = new URL(strUrl.toString());
+        } catch (MalformedURLException e) {
+            Log.e(LOG_TAG, e.getMessage());
+        }
+
+        switch (item.getItemId()) {
+            case R.id.refresh : new FetchWeatherTask().execute(url);
+        }
+
+        return true;
     }
 
 }
