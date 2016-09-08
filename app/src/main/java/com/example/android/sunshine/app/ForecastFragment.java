@@ -3,9 +3,13 @@ package com.example.android.sunshine.app;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -26,6 +30,28 @@ import java.util.Arrays;
  */
 public class ForecastFragment extends Fragment {
 
+
+    private static final String LOG_TAG = ForecastFragment.class.getSimpleName();
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.forecastfragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.refresh : new FetchWeatherTask().execute();
+        }
+
+        return true;
+    }
 
     public ForecastFragment() {
         // Required empty public constructor
@@ -108,8 +134,10 @@ public class ForecastFragment extends Fragment {
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
+                Log.v(LOG_TAG,forecastJsonStr);
+
             } catch (IOException e) {
-                Log.e("PlaceholderFragment", "Error ", e);
+                Log.e(LOG_TAG, "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attemping
                 // to parse it.
                 return null;
@@ -121,7 +149,7 @@ public class ForecastFragment extends Fragment {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e("PlaceholderFragment", "Error closing stream", e);
+                        Log.e(LOG_TAG, "Error closing stream", e);
                     }
                 }
             }
