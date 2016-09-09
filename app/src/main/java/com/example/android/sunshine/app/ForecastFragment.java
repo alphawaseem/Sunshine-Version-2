@@ -2,9 +2,11 @@ package com.example.android.sunshine.app;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
@@ -48,7 +50,7 @@ public class ForecastFragment extends Fragment {
     private final String API_KEY_PARAM = "appid";
     private final String BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
     ArrayAdapter<String> adapter;
-    private int cityId = 573201;
+    private String cityId = "573201";
     private int noOfDays = 7 ;
     private String appid = "your api here";
     private  String units = "metrics";
@@ -74,6 +76,9 @@ public class ForecastFragment extends Fragment {
                 "Sat 6/28 - TRAPPED IN WEATHERSTATION - 23/18",
                 "Sun 6/29 - Sunny - 20/7"
         };
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        cityId = sharedPref.getString(getResources().getString(R.string.location_key), "");
+
         ArrayList<String> weekForecast = new ArrayList<String>(Arrays.asList(data));
 
         adapter = new ArrayAdapter<String>(getActivity(),
@@ -213,7 +218,7 @@ public class ForecastFragment extends Fragment {
 
         try {
             Uri builder = Uri.parse(BASE_URL).buildUpon().
-                appendQueryParameter(QUERY_PARAM,Integer.toString(cityId))
+                    appendQueryParameter(QUERY_PARAM, cityId)
                 .appendQueryParameter(DAYS_PARAM,Integer.toString(noOfDays))
                 .appendQueryParameter(UNITS_PARAM,units)
                 .appendQueryParameter(MODE_PARAM,mode)

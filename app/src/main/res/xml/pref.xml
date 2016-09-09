@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="pref_sync"
-        android:summary="Demo box summary"
-        android:title="Demo box" />
-    <ListPreference
-        android:defaultValue="Earth"
-        android:dependency="pref_sync"
-        android:dialogTitle="Select one"
-        android:entries="@array/planets_array"
-        android:entryValues="@array/planets_array"
-        android:key="pref_syncConnectionType"
-        android:title="List Demo" />
+    <EditTextPreference
+        android:defaultValue="573201"
+        android:inputType="number"
+        android:key="location"
+        android:title="Enter Postal ID" />
+
 </PreferenceScreen>
