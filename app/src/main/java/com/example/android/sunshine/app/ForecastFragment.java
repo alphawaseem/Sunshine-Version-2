@@ -34,7 +34,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -67,19 +66,11 @@ public class ForecastFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         // dummy data copied from udacity git repo
-        String[] data = {
-                "Mon 6/23 - Sunny - 31/17",
-                "Tue 6/24 - Foggy - 21/8",
-                "Wed 6/25 - Cloudy - 22/17",
-                "Thurs 6/26 - Rainy - 18/11",
-                "Fri 6/27 - Foggy - 21/10",
-                "Sat 6/28 - TRAPPED IN WEATHERSTATION - 23/18",
-                "Sun 6/29 - Sunny - 20/7"
-        };
+
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
         cityId = sharedPref.getString(getResources().getString(R.string.location_key), "");
 
-        ArrayList<String> weekForecast = new ArrayList<String>(Arrays.asList(data));
+        ArrayList<String> weekForecast = new ArrayList<String>();
 
         adapter = new ArrayAdapter<String>(getActivity(),
                 R.layout.list_item_forecast,
@@ -95,14 +86,26 @@ public class ForecastFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
-
-
-
-
         return rootView;
     }
 
+    private void updateWeather() {
+
+        try {
+            Uri builder = Uri.parse(BASE_URL).buildUpon().
+                    appendQueryParameter(QUERY_PARAM, cityId)
+                    .appendQueryParameter(DAYS_PARAM, Integer.toString(noOfDays))
+                    .appendQueryParameter(UNITS_PARAM, units)
+                    .appendQueryParameter(MODE_PARAM, mode)
+                    .appendQueryParameter(API_KEY_PARAM, appid).build();
+
+            URL url = new URL(builder.toString());
+            FetchWeatherTask fetchWeatherTask = new FetchWeatherTask();
+            fetchWeatherTask.execute(url);
+        } catch (MalformedURLException e) {
+            Log.e(LOG_TAG, e.getLocalizedMessage());
+        }
+    }
     /* The date/time conversion code is going to be moved outside the asynctask later,
        * so for convenience we're breaking it out into its own method now.
        */
@@ -216,21 +219,11 @@ public class ForecastFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        try {
-            Uri builder = Uri.parse(BASE_URL).buildUpon().
-                    appendQueryParameter(QUERY_PARAM, cityId)
-                .appendQueryParameter(DAYS_PARAM,Integer.toString(noOfDays))
-                .appendQueryParameter(UNITS_PARAM,units)
-                .appendQueryParameter(MODE_PARAM,mode)
-                .appendQueryParameter(API_KEY_PARAM,appid).build();
 
-            URL url = new URL(builder.toString());
             switch (item.getItemId()) {
-                case R.id.refresh : new FetchWeatherTask().execute(url);
+                case R.id.refresh:
+                    updateWeather();
             }
-        } catch (MalformedURLException e) {
-            Log.e(LOG_TAG, e.getMessage());
-        }
         return true;
     }
 
