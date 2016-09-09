@@ -1,6 +1,7 @@
 package com.example.android.sunshine.app;
 
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -37,7 +38,16 @@ public class ForecastFragment extends Fragment {
     private int cityId = 573201;
     private int noOfDays = 7 ;
     private String appid = AppId.getApiKey();
-    private String units = "metrics";
+    private  String units = "metrics";
+    private String mode = "json";
+
+    private final String QUERY_PARAM  = "q" ;
+    private final String MODE_PARAM = "mode";
+    private final String UNITS_PARAM = "units" ;
+    private final String DAYS_PARAM = "cnt" ;
+    private final String API_KEY_PARAM = "appid" ;
+
+    private final String BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?" ;
 
     public ForecastFragment() {
         // Required empty public constructor
@@ -156,19 +166,21 @@ public class ForecastFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        StringBuilder strUrl = new StringBuilder("http://api.openweathermap.org/data/2.5/forecast/daily?mode=json");
-        strUrl.append("&q=").append(cityId).append("&units=").append(units).append("&cnt=").append(noOfDays).append("&appid=").append(appid);
-        URL url = null;
         try {
-            url = new URL(strUrl.toString());
+            Uri builder = Uri.parse(BASE_URL).buildUpon().
+                appendQueryParameter(QUERY_PARAM,Integer.toString(cityId))
+                .appendQueryParameter(DAYS_PARAM,Integer.toString(noOfDays))
+                .appendQueryParameter(UNITS_PARAM,units)
+                .appendQueryParameter(MODE_PARAM,mode)
+                .appendQueryParameter(API_KEY_PARAM,appid).build();
+
+            URL url = new URL(builder.toString());
+            switch (item.getItemId()) {
+                case R.id.refresh : new FetchWeatherTask().execute(url);
+            }
         } catch (MalformedURLException e) {
             Log.e(LOG_TAG, e.getMessage());
         }
-
-        switch (item.getItemId()) {
-            case R.id.refresh : new FetchWeatherTask().execute(url);
-        }
-
         return true;
     }
 
