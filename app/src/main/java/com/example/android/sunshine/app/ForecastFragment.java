@@ -50,7 +50,7 @@ public class ForecastFragment extends Fragment {
     ArrayAdapter<String> adapter;
     private int cityId = 573201;
     private int noOfDays = 7 ;
-    private String appid = AppId.getApiKey();
+    private String appid = "your api here";
     private  String units = "metrics";
     private String mode = "json";
 
