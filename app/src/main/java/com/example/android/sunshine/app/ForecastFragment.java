@@ -1,7 +1,7 @@
 package com.example.android.sunshine.app;
 
 
-import android.app.LauncherActivity;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,8 +18,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,22 +41,18 @@ public class ForecastFragment extends Fragment {
 
 
     private static final String LOG_TAG = ForecastFragment.class.getSimpleName();
-
+    private final String QUERY_PARAM = "q";
+    private final String MODE_PARAM = "mode";
+    private final String UNITS_PARAM = "units";
+    private final String DAYS_PARAM = "cnt";
+    private final String API_KEY_PARAM = "appid";
+    private final String BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
+    ArrayAdapter<String> adapter;
     private int cityId = 573201;
     private int noOfDays = 7 ;
     private String appid = AppId.getApiKey();
     private  String units = "metrics";
     private String mode = "json";
-
-    private final String QUERY_PARAM  = "q" ;
-    private final String MODE_PARAM = "mode";
-    private final String UNITS_PARAM = "units" ;
-    private final String DAYS_PARAM = "cnt" ;
-    private final String API_KEY_PARAM = "appid" ;
-
-    private final String BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?" ;
-
-    ArrayAdapter<String> adapter ;
 
     public ForecastFragment() {
         // Required empty public constructor
@@ -91,7 +85,9 @@ public class ForecastFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String string = adapter.getItem(i);
-                Toast.makeText(getContext(), string,Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
+                intent.putExtra("Text", string);
+                startActivity(intent);
             }
         });
 
@@ -201,11 +197,43 @@ public class ForecastFragment extends Fragment {
 
     }
 
-    public class FetchWeatherTask extends AsyncTask<URL,Void,String[]> {
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.forecastfragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        try {
+            Uri builder = Uri.parse(BASE_URL).buildUpon().
+                appendQueryParameter(QUERY_PARAM,Integer.toString(cityId))
+                .appendQueryParameter(DAYS_PARAM,Integer.toString(noOfDays))
+                .appendQueryParameter(UNITS_PARAM,units)
+                .appendQueryParameter(MODE_PARAM,mode)
+                .appendQueryParameter(API_KEY_PARAM,appid).build();
+
+            URL url = new URL(builder.toString());
+            switch (item.getItemId()) {
+                case R.id.refresh : new FetchWeatherTask().execute(url);
+            }
+        } catch (MalformedURLException e) {
+            Log.e(LOG_TAG, e.getMessage());
+        }
+        return true;
+    }
+
+    public class FetchWeatherTask extends AsyncTask<URL, Void, String[]> {
 
         @Override
         protected void onPostExecute(String[] strings) {
-            if(strings!=null) {
+            if (strings != null) {
                 adapter.clear();
                 adapter.addAll(strings);
             }
@@ -256,7 +284,7 @@ public class ForecastFragment extends Fragment {
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
-                Log.v(LOG_TAG,forecastJsonStr);
+                Log.v(LOG_TAG, forecastJsonStr);
 
             } catch (IOException e) {
                 Log.e(LOG_TAG, e.getMessage());
@@ -276,44 +304,12 @@ public class ForecastFragment extends Fragment {
                 }
             }
             try {
-                return getWeatherDataFromJson(forecastJsonStr,noOfDays);
+                return getWeatherDataFromJson(forecastJsonStr, noOfDays);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             return null;
         }
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.forecastfragment, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        try {
-            Uri builder = Uri.parse(BASE_URL).buildUpon().
-                appendQueryParameter(QUERY_PARAM,Integer.toString(cityId))
-                .appendQueryParameter(DAYS_PARAM,Integer.toString(noOfDays))
-                .appendQueryParameter(UNITS_PARAM,units)
-                .appendQueryParameter(MODE_PARAM,mode)
-                .appendQueryParameter(API_KEY_PARAM,appid).build();
-
-            URL url = new URL(builder.toString());
-            switch (item.getItemId()) {
-                case R.id.refresh : new FetchWeatherTask().execute(url);
-            }
-        } catch (MalformedURLException e) {
-            Log.e(LOG_TAG, e.getMessage());
-        }
-        return true;
     }
 
 }
