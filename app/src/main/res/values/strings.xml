@@ -9,7 +9,7 @@
     //strings used for location settings
     <string name="location_key">location</string>
     <string name="default_postal_code">573201</string>
-    <string name="location_title">Enter your postal code</string>
+    <string name="location_title">City ID</string>
 
     //strings used for unit format in temp
     <string name="units_key">units</string>

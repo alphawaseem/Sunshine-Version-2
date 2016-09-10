@@ -7,7 +7,7 @@
         android:title="Enter Postal ID" />
 
     <ListPreference
-        android:defaultValue="@string/default_unit"
+        android:defaultValue="@string/default_unit_metrics"
         android:entries="@array/units_values_array"
         android:entryValues="@array/units_values_array"
         android:key="@string/units_key"
