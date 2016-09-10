@@ -16,6 +16,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         bindPreferenceSummaryToValue(findPreference(getString(R.string.location_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.units_key)));
         return true;
     }
 

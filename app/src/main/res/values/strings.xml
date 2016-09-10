@@ -6,11 +6,18 @@
     <string name="action_settings">Settings</string>
     <string name="action_refresh">Refresh</string>
 
+    //strings used for location settings
     <string name="location_key">location</string>
-    <string-array name="planets_array">
-        <item>Mercury</item>
-        <item>Venus</item>
-        <item>Earth</item>
-        <item>Mars</item>
+    <string name="default_postal_code">573201</string>
+    <string name="location_title">Enter your postal code</string>
+
+    //strings used for unit format in temp
+    <string name="units_key">units</string>
+    <string name="units_title">Temperature Units</string>
+    <string name="default_unit_metrics">metrics</string>
+    <string name="unit_imperial">imperial</string>
+    <string-array name="units_values_array">
+        <item>metrics</item>
+        <item>imperial</item>
     </string-array>
 </resources>

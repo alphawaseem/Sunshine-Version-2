@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <EditTextPreference
-        android:defaultValue="573201"
+        android:defaultValue="@string/default_postal_code"
         android:inputType="number"
         android:key="location"
         android:title="Enter Postal ID" />
+
+    <ListPreference
+        android:defaultValue="@string/default_unit"
+        android:entries="@array/units_values_array"
+        android:entryValues="@array/units_values_array"
+        android:key="@string/units_key"
+        android:title="@string/units_title" />
 
 </PreferenceScreen>
