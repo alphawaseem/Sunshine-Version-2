@@ -89,6 +89,12 @@ public class ForecastFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+    }
+
     private void updateWeather() {
 
         try {
