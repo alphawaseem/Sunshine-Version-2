@@ -3,8 +3,8 @@
     <EditTextPreference
         android:defaultValue="@string/default_postal_code"
         android:inputType="number"
-        android:key="location"
-        android:title="Enter Postal ID" />
+        android:key="@string/location_key"
+        android:title="@string/location_title" />
 
     <ListPreference
         android:defaultValue="@string/default_unit_metrics"
